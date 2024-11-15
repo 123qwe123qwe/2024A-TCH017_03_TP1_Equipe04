@@ -1,16 +1,25 @@
-;TP 1
-;Thomas Simard, Alexandre Cirurso, Mouhcine Imaoun, Mcnestlie Lopez et Ziad Hafez
+;CONVERSION DE NOMBRES IEEE 754 EN FORMAT DECIMAL EN ASSEMBLEUR PEP8
+;
+;         AUTEURS         : Thomas Simard, Alexandre Cirurso, Mouhcine Imaoun, Mcnestlie Lopez et Ziad Hafez
+;         DATE            : 15/11/2024
+;         EQUIPE          : Gr03 - Equipe 04
+;         DESCRIPTION     :
+;
+;                  Ce projet montre comment transformer des nombres cod√©s en 0 et 1 (format IEEE 754) 
+;                  en nombres d√©cimaux. Le programme v√©rifie si les donn√©es sont correctes,
+;                  g√®re des cas sp√©ciaux comme des nombres tr√®s petits, 
+;                  et affiche les √©tapes pour mieux comprendre la conversion.             
 
          BR      main,i 
 
 tab:     .BLOCK  66          ;variable du tableau
-tab_d:   .BLOCK  66          ;variable du tableau stockant les puissances nÈgatives pour le calcul de la partie dÈcimal
+tab_d:   .BLOCK  66          ;variable du tableau stockant les puissances n√©gatives pour le calcul de la partie d√©cimal
 i:       .WORD   0           ;index i
 j:       .WORD   0           ;index j
 nombre:  .WORD   0           
 expo:    .WORD   0           ;exposant
-mant_E:  .WORD   0           ;partie entiËre du nombre en dÈcimal
-mant_D:  .WORD   0           ;partie dÈcimale du nombre en dÈcimal
+mant_E:  .WORD   0           ;partie enti√®re du nombre en d√©cimal
+mant_D:  .WORD   0           ;partie d√©cimale du nombre en d√©cimal
 c_tmp:   .WORD   0           ;valeurs temporaires
 d_tmp:   .WORD   0
 e_tmp:   .WORD   0
@@ -27,13 +36,13 @@ TAILLE:  .EQUATE 66
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-main:   STRO     txt1,d      ;Execute les fonctions principales dans l'ordre dediÈ.
+main:   STRO     txt1,d      ;Execute les fonctions principales dans l'ordre dedi√©.
 
          BR      remp,i
 
 
 
-remp:    LDA     0,i         ;Remplit le tableau (32 entrÈes) de chiffres binaires.
+remp:    LDA     0,i         ;Remplit le tableau (32 entr√©es) de chiffres binaires.
          STA     i,d
         
 a_whi:   LDX     i,d         ;Lorsqu'on est au 18e index (premiere case de la mantisse), on vient mettre le 1 implicite.
@@ -92,40 +101,40 @@ exp:     LDA     16,i         ;initialise le tableau a l'index 16 (debut de l'ex
          LDA     1,i
          STA     c_tmp,d      ;Variable temporaire = 1, (2^0=1)
 
-         LDA     0,i         ;Expo=0
+         LDA     0,i          ;Expo=0
          STA     expo,d
 
          BR      c_whi,i
 
-c_whi:   LDX     i,d         ;Compare Si i=0 lorsque i=16 initialement (16 est le dernier index des 8 bits de l'exposant)
+c_whi:   LDX     i,d          ;Compare Si i=0 lorsque i=16 initialement (16 est le dernier index des 8 bits de l'exposant)
          CPX     0,i        
          BRNE    c_bdy,i     
-         BR      c_end,i     ;Lorsqu'on est rendu a i=0, on a tout parcouru les cases de l'exposant et on peut aller a la fin
+         BR      c_end,i      ;Lorsqu'on est rendu a i=0, on a tout parcouru les cases de l'exposant et on peut aller a la fin
 
 c_bdy:   LDX     i,d
          LDA     tab,x
-         CPA     1,i         ;Si la valeur binaire est de 1 on peut additionner la puissance de 2 selon l'index respectif.
+         CPA     1,i          ;Si la valeur binaire est de 1 on peut additionner la puissance de 2 selon l'index respectif.
          BREQ    c_add,i
          BR      c_suite,i
 
-c_suite: LDA     c_tmp,d    ;On multiplie par deux la valeur temporaire car on passe a la prochaine case et c'est la prochaine puissance de 2
-         ASLA                ;Ex: [0] c_tmp=1 [1] c_tmp=2 [2] c_tmp=4 [3] c_tmp=8 et ainsi de suite.
+c_suite: LDA     c_tmp,d      ;On multiplie par deux la valeur temporaire car on passe a la prochaine case et c'est la prochaine puissance de 2
+         ASLA                 ;Ex: [0] c_tmp=1 [1] c_tmp=2 [2] c_tmp=4 [3] c_tmp=8 et ainsi de suite.
          STA     c_tmp,d 
 
  
-         LDA     i,d         ;i--
+         LDA     i,d          ;i--
          SUBA    2,i
          STA     i,d
          BR      c_whi,i  
          
-c_end:   LDA     expo,d      ;On soustrait le biais (127) a la valeur de l'exposant pour avoir sa valeur reelle.
+c_end:   LDA     expo,d       ;On soustrait le biais (127) a la valeur de l'exposant pour avoir sa valeur reelle.
 
          SUBA    127,i
          STA     expo,d  
          BR      mant,i
          STOP
 
-c_add:   LDA     expo,d      ;On additionne la valeur temporaire qui est la puissance de 2 selon l'index a la valeur cummlÈ dÈcimal.
+c_add:   LDA     expo,d       ;On additionne la valeur temporaire qui est la puissance de 2 selon l'index a la valeur cumml√© d√©cimal.
        
          ADDA    c_tmp,d
          STA     expo,d
@@ -135,10 +144,10 @@ c_add:   LDA     expo,d      ;On additionne la valeur temporaire qui est la puis
 ;                                                     CALCUL DE LA PARTIE ENTIERE DE LA MANTISSE
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
 
-mant:    LDA     expo,d      ;CrÈe la variable n(Permet de dÈfinir sÈparÈment la partie entiere et dÈcimale)  
+mant:    LDA     expo,d      ;Cr√©e la variable n(Permet de d√©finir s√©par√©ment la partie entiere et d√©cimale)  
          STA     n,d
          LDA     n,d              
-         ASLA                ;On multiplie par deux pour qu'elle soit compatible avec le tableau qui est indexÈ par saut de 2
+         ASLA                ;On multiplie par deux pour qu'elle soit compatible avec le tableau qui est index√© par saut de 2
          STA     n,d
 
          
@@ -174,13 +183,13 @@ d_suite1:LDA     d_tmp,d      ;On multiplie par deux la valeur temporaire car on
          ASLA
          STA     d_tmp,d
          
-         LDA     i,d         ;i-- (passe a la prochaine case du tableau)
+         LDA     i,d          ;i-- (passe a la prochaine case du tableau)
          SUBA    2,i
          STA     i,d
 
          BR      d_whi1,i
 
-d_add1:  LDA     mant_E,d    ;Additionne la puissance actuelle a la mantisse entiere
+d_add1:  LDA     mant_E,d     ;Additionne la puissance actuelle a la mantisse entiere
          ADDA    d_tmp,d
          STA     mant_E,d
 
@@ -190,12 +199,12 @@ d_end:   BR      mant_4,i
          STOP
 
 
-mant_2:  LDA     1,i         ;Si l'exposant = 0, la mantisse entiere = 1
+mant_2:  LDA     1,i          ;Si l'exposant = 0, la mantisse entiere = 1
          STA     mant_E,d 
          BR      mant_4,i
          STOP
 
-mant_3:  LDA     0,i         ;Si l'exposant est negatif, la mantisse entiere = 0
+mant_3:  LDA     0,i          ;Si l'exposant est negatif, la mantisse entiere = 0
          STA     mant_E,d
          BR      mant_5,i
 
@@ -205,16 +214,16 @@ mant_3:  LDA     0,i         ;Si l'exposant est negatif, la mantisse entiere = 0
 ;                                                                 CALCUL DE LA PARTIE DECIMAL DE LA MANTISSE
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-mant_4:  LDA     expo,i      ;Verifie si l'exposant est nÈgatif, cela change la faÁon dont la mantisse est calculÈ.
+mant_4:  LDA     expo,i      ;Verifie si l'exposant est n√©gatif, cela change la fa√ßon dont la mantisse est calcul√©.
          CPA     0,i
          BRLT    mant_5
 
-         LDA     20,i        ;Commence a la case aprËs la partie entiËre de la mantisse (20+n)
+         LDA     20,i        ;Commence a la case apr√®s la partie enti√®re de la mantisse (20+n)
          ADDA    n,d
          STA     i,d 
 
          LDX     i,d
-         LDA     500,i        ;La valeur temporaire e_tmp = 500, elle reprÈsente la premiËre puissance de 2 nÈgative, 2^-1=0.5, on l'Ècrit sur trois entiers donc 500
+         LDA     500,i        ;La valeur temporaire e_tmp = 500, elle repr√©sente la premi√®re puissance de 2 n√©gative, 2^-1=0.5, on l'√©crit sur trois entiers donc 500
          STA     tab_d,x
 
 e_whi:   LDX     i,d         ;Parcours case pendant qu'on n'est pas a la derniere case du tableau
@@ -222,7 +231,7 @@ e_whi:   LDX     i,d         ;Parcours case pendant qu'on n'est pas a la dernier
          BRNE    e_bdy,i
          BR      e_end,i
 
-e_bdy:   LDX     i,d         ;Si la valeur de l'index=1, on peut additionner la puissance d'exposant de 2 nÈgative selon l'index
+e_bdy:   LDX     i,d         ;Si la valeur de l'index=1, on peut additionner la puissance d'exposant de 2 n√©gative selon l'index
          LDA     tab,x
          CPA     1,i
 
@@ -240,7 +249,7 @@ e_suite: LDX     i,d
          STA     i,d
 
          LDA     e_tmp,d     ;Prends la variable temporaire(la variable de la case d'avant), la divise par deux et la stock dans la nouvelle case du tableau
-         ASRA                ;Dans ce programme, a chaque nouvelle indexe on obtient une nouvelle valeur des puissances negatives de 2 attitrÈs ‡ e_tmp.
+         ASRA                ;Dans ce programme, a chaque nouvelle indexe on obtient une nouvelle valeur des puissances negatives de 2 attitr√©s √† e_tmp.
          STA     e_tmp,d     ;Ex: [1er chiffre de la mantisse decimal] e_tmp=500 (0.5) [2e] e_tmp=250 (0.25) [3e] e_tmp=125 (0.125) etc.
 
          LDX     i,d         ;Pour la nouvelle case, on mets cette valeur
@@ -256,7 +265,7 @@ e_end:   BR      signe,i
          STOP
 
 e_add:   LDX     i,d
-         LDA     mant_D,d    ;Addititionne la valeur temporaire au total de la partie dÈcimal de la mantisse
+         LDA     mant_D,d    ;Addititionne la valeur temporaire au total de la partie d√©cimal de la mantisse
          ADDA    tab_d,x
          STA     mant_D,d
 
@@ -289,8 +298,8 @@ f_bdy:   LDA     e_tmp,d     ;si j!=0, on divise e_tmp par deux et on incremente
 
          BR      f_whi,i
 
-f_end:   LDA     18,i        ;On commence l'analyse de la mantisse (incluant le 1 implicite) une fois que la valeur temporaire est deja divise selon les puissances nÈgatives
-         STA     i,d         ;Pour cela on initialise l'index ‡ 18 (case ou dÈbute la mantisse(incluant le 1 implicite)
+f_end:   LDA     18,i        ;On commence l'analyse de la mantisse (incluant le 1 implicite) une fois que la valeur temporaire est deja divise selon les puissances n√©gatives
+         STA     i,d         ;Pour cela on initialise l'index √† 18 (case ou d√©bute la mantisse(incluant le 1 implicite)
 
          LDX     i,d        
          LDA     e_tmp,d
@@ -369,7 +378,7 @@ p_suite2:CHARO   '\n',i      ;Affiche un message et la mantisse avant l'exposant
 ;       
 p_whi2:  LDX     i,d         ;Commence a l'index 20 et parcours les case jusqu'a la fin du tableau
          CPX     TAILLE,i    ; a chaque index, on imprime la  valeur
-         BREQ    p_suite4,i  ;On affiche ainsi la mantisse originalement avant d'appliquÈ l'exposant
+         BREQ    p_suite4,i  ;On affiche ainsi la mantisse originalement avant d'appliqu√© l'exposant
          BR      p_bdy2,i
 
 p_bdy2:  LDX     i,d
@@ -381,18 +390,18 @@ p_bdy2:  LDX     i,d
           
          BR      p_whi2,i
 
-p_suite4:CHARO   '\n',i      ;affiche un message et la mantisse aprËs l'exposant
+p_suite4:CHARO   '\n',i      ;affiche un message et la mantisse apr√®s l'exposant
          STRO    txt7,d
 
-         LDA     expo,d      ;Verifie si l'exposant est positif, nulle ou nÈgatif
-         CPA     0,i         ;DÈpendÈment du signe, la mantisse n'est pas affichÈ de la mÍme faÁon.
+         LDA     expo,d      ;Verifie si l'exposant est positif, nulle ou n√©gatif
+         CPA     0,i         ;D√©pend√©ment du signe, la mantisse n'est pas affich√© de la m√™me fa√ßon.
          BREQ    p_nul,i
          BRLT    p_neg,i 
          BRGT    p_pos,i 
 
 ;---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-p_nul:   LDA     20,i        ;Si l'exposant est nul, commence ‡ l'index 20 (mantisse sans le 1 implicite)
+p_nul:   LDA     20,i        ;Si l'exposant est nul, commence √† l'index 20 (mantisse sans le 1 implicite)
          STA     i,d
 
          CHARO   '1',i       ;On affiche "1." Pour afficher le 1 implicite avant d'afficher la mantisse
@@ -404,7 +413,7 @@ p_whi3:  LDX     i,d         ;On fait une boucle jusqu'a la fin du tableau
          BR      p_bdy3,i
 
 p_bdy3:  LDX     i,d         ;On imprime la valeur dans l'index pour chaque index
-         DECO    tab,x       ;La mantisse aprËs le 1 implicite est ainsi affichÈ au complet
+         DECO    tab,x       ;La mantisse apr√®s le 1 implicite est ainsi affich√© au complet
                              ; On observe ainsi "1.(la mantisse)"
          LDA     i,d         ;i++
          ADDA    2,i
@@ -414,24 +423,24 @@ p_bdy3:  LDX     i,d         ;On imprime la valeur dans l'index pour chaque inde
 
 ;---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-p_neg:   CHARO   '0',i       ;Si l'exposant est nÈgatif, on commence par afficher "0."
-         CHARO   '.',i       ;Ici, puisque l'exposant est nÈgatif, on veut savoir combien de zÈro il faut afficher avant d'afficher la mantisse.
-                             ;Quand on multiplie par un exposant nÈgatif, on dÈcale la virgule vers la gauche, donc on doit mettre des 0 a gauche de la mantisse dÈpendemment de la grandeur de l'exposant.
+p_neg:   CHARO   '0',i       ;Si l'exposant est n√©gatif, on commence par afficher "0."
+         CHARO   '.',i       ;Ici, puisque l'exposant est n√©gatif, on veut savoir combien de z√©ro il faut afficher avant d'afficher la mantisse.
+                             ;Quand on multiplie par un exposant n√©gatif, on d√©cale la virgule vers la gauche, donc on doit mettre des 0 a gauche de la mantisse d√©pendemment de la grandeur de l'exposant.
          LDA     expo,d      ;On charge l'exposant et le store dans m pour ne pas modifier sa valeur original
          STA     m,d
 
-p_whi4:  LDA     m,d         ;On fait une boucle avec m jusqu'‡ m=-1
-         CPA     -1,i        ;On fait =-1 plutÙt que =0 car nous avons dÈj‡ un 0. d'affichÈ.
+p_whi4:  LDA     m,d         ;On fait une boucle avec m jusqu'√† m=-1
+         CPA     -1,i        ;On fait =-1 plut√¥t que =0 car nous avons d√©j√† un 0. d'affich√©.
          
          BREQ    p_end4,i
          BR      p_bdy4,i
 
-p_bdy4:  CHARO   '0',i       ;Pour chaque itÈration, on affiche un 0.
+p_bdy4:  CHARO   '0',i       ;Pour chaque it√©ration, on affiche un 0.
          LDA     m,d         ;m++
          ADDA    1,i
          STA     m,d
 
-         BR      p_whi4,i    ;De mÍme, pour chaque valeur de l'exposant nÈgatif, on affiche un 0.
+         BR      p_whi4,i    ;De m√™me, pour chaque valeur de l'exposant n√©gatif, on affiche un 0.
 
 p_end4:  LDA     18,i        ;On charge 18 dans l'index pour afficher la mantisse avec son 1 implicite.
          STA     i,d
@@ -440,15 +449,15 @@ p_end4:  LDA     18,i        ;On charge 18 dans l'index pour afficher la mantiss
 
 ;---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-p_pos:   LDA     18,i        ;Lorsque l'exposant est positif, on affiche la premiËre partie dans la mantisse, la virgule et puis la deuxiËme partie de la mantisse
+p_pos:   LDA     18,i        ;Lorsque l'exposant est positif, on affiche la premi√®re partie dans la mantisse, la virgule et puis la deuxi√®me partie de la mantisse
          STA     i,d
 
-         LDA     i,d         ;Defini ou est la virgule, 18 + n, (n est expliquÈ plus tÙt dans la fonction)
+         LDA     i,d         ;Defini ou est la virgule, 18 + n, (n est expliqu√© plus t√¥t dans la fonction)
          ADDA    n,d
          ADDA    2,i
          STA     x,d         ;On ajoute 2 et on store dans x
-                             ;X est l'index ou qu'on doit arrÍter d'afficher car il est l'index qui divise la mantisse en deux partie.
-p_whi5:  LDX     i,d         ;On compare l'index 18(mantisse avec 1 implicite) ‡ x et on fait une boucle
+                             ;X est l'index ou qu'on doit arr√™ter d'afficher car il est l'index qui divise la mantisse en deux partie.
+p_whi5:  LDX     i,d         ;On compare l'index 18(mantisse avec 1 implicite) √† x et on fait une boucle
          CPX     x,d
 
          BREQ    p_pos2,i
@@ -463,9 +472,9 @@ p_bdy5:  LDX     i,d         ;Pour chaque index, on affiche la valeur
 
          BR      p_whi5,i
 
-p_pos2:  CHARO   '.',i       ;AprËs avoir afficher toute la premiËre partie de la mantisse, un affiche le point/la virgule.
+p_pos2:  CHARO   '.',i       ;Apr√®s avoir afficher toute la premi√®re partie de la mantisse, un affiche le point/la virgule.
 
-p_whi6:  LDX     i,d         ;On compare maintenent i ‡ la taille maximum du tableau pour afficher la partie restante de la mantisse en faisant une boucle
+p_whi6:  LDX     i,d         ;On compare maintenent i √† la taille maximum du tableau pour afficher la partie restante de la mantisse en faisant une boucle
          CPX     TAILLE,i    
 
          BREQ    p_suite3,i
@@ -488,9 +497,9 @@ p_bdy6:  LDX     i,d         ;pour chaque index, on affiche la valeur
 p_suite3:CHARO   '\n',i      ;Affiche un message et le nombre complet en decimal
          STRO    txt5,d
          
-         DECO    mant_E,d    ;Affiche la partie entiËre du nombre en dÈcimal
+         DECO    mant_E,d    ;Affiche la partie enti√®re du nombre en d√©cimal
          CHARO    '.',i      ;Affiche un point
-         LDA     mant_D,d    ;On vÈrifie si la partie dÈcimal=0
+         LDA     mant_D,d    ;On v√©rifie si la partie d√©cimal=0
          CPA     0,i
          BREQ    add_0,i
 
@@ -503,11 +512,11 @@ p_suite6:LDA     mant_D,d
          BRLT    put2_0,i    ;Pas besoin de le faire pour 3 0 puisque la valeur de la partie decimal sera deja de 0 si elle est trop petite, on ne veut donc pas afficher accidentellement 4 0.
 
          
-p_suite5:DECO    mant_D,d    ;affiche la partie dÈcimal de la mantisse
+p_suite5:DECO    mant_D,d    ;affiche la partie d√©cimal de la mantisse
 
          BR END,i
 
-add_0:   CHARO   '0',i       ;si partie dÈcimal=0, on affiche deux zÈros supplÈmentaires pour avoir la prÈcision dÈcimal ‡ trois chiffres.
+add_0:   CHARO   '0',i       ;si partie d√©cimal=0, on affiche deux z√©ros suppl√©mentaires pour avoir la pr√©cision d√©cimal √† trois chiffres.
          CHARO   '0',i
 
          BR p_suite5,i
@@ -532,9 +541,9 @@ txt2:    .ASCII"ERREUR: la valeur saisie n'est pas binaire!\n\x00"
          STOP
 txt3:    .ASCII"L'exposant en binaire est: \x00"
          STOP
-txt4:    .ASCII"L'exposant en dÈcimal aprËs le biais est: \x00"
+txt4:    .ASCII"L'exposant en d√©cimal apr√®s le biais est: \x00"
          STOP
-txt5:    .ASCII"Le nombre complet en dÈcimal est: \x00"
+txt5:    .ASCII"Le nombre complet en d√©cimal est: \x00"
          STOP
 txt6:    .ASCII"La mantisse avant l'exposant est: 1.\x00"
          STOP
